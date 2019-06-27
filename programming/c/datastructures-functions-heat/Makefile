@@ -1,5 +1,5 @@
 ifeq ($(COMP),)
-COMP=cray
+COMP=gnu
 endif
 
 ifeq ($(COMP),cray)
@@ -9,9 +9,10 @@ LIBS=-L/appl/opt/libpng/lib -lpng -lz
 endif
 
 ifeq ($(COMP),gnu)
-CC=gcc
-CCFLAGS=-O3 -Wall
-LIBS=-lpng
+CC=cc
+#CCFLAGS=-O3 -Wall
+CCFLAGS=-O3 -I/opt/local/include/libpng16
+LIBS=-L/opt/local/lib -lpng
 endif
 
 EXE=laplacian

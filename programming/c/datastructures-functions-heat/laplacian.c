@@ -36,15 +36,21 @@ int main(void)
     for (i = 0; i < NX; i++) {
         laplacian[i][0] = laplacian[i][NY - 1] = 0.0;
     }
-    for (j = 0; i < NY; j++) {
+    for (j = 0; j < NY; j++) {
         laplacian[0][j] = laplacian[NX - 1][j] = 0.0;
     }
 
 
     // Evaluate the Laplacian
     // *INDENT-OFF*
-#error Add the missing part
-
+// Add the missing part
+	for (i = 1; i < NX - 1; i++) {
+		for (j = 1; j < NY - 1; j++) {
+			laplacian[i][j] = 
+					(array[i - 1][j] - 2.0 * array[i][j] + array[i + 1][j]) / (DX * DX)
+					+ (array[i][j - 1] - 2.0 * array[i][j] + array[i][j + 1]) / (DY * DY);
+		}
+	}
     // *INDENT-ON*
 
     // Call the png writer routine
