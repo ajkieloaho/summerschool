@@ -8,11 +8,28 @@
 #define DX 0.01
 #define DY 0.01
 
+
+typedef struct s {
+	int nx;
+	int ny;
+	float dx;
+	float dy;
+	float dx2;
+} field;
+
+
+int init_2d_array() {
+	
+}
+
 int main(void)
 {
     int i, j, error_code;
     double array[NX][NY];
     double laplacian[NX][NY];
+
+	field *t_p, t;
+	t_p = &t;
 
     // First initalize the inner values to zero
     for (i = 1; i < NX - 1; i++) {
