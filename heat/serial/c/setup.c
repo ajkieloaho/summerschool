@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 
 #include "heat.h"
 #include "pngwriter.h"
@@ -78,7 +79,8 @@ void generate_field(field *temperature)
 {
     int i, j;
     double radius;
-    int dx, dy;
+    int dx, dy, distance;
+	
 
     /* Allocate the temperature array, note that
      * we have to allocate also the ghost layers */
@@ -87,7 +89,22 @@ void generate_field(field *temperature)
 
     /* TODO: Initialize the values of temperature */
 #error Add field initialization
+	
+	radius = temperature->nx / 6;
+	
+	for (i = 0; i < temperature->nx; i++) {
+		for (j = 0; j < temperature->ny; j++) {
+			distance = (i - nx / 2) * (i - nx / 2) + (j - ny / 2) * (j - ny / 2)
+			if (distance < radius * radius) {
+			
+				temperature->data[i][j] = 0;
 
+			} else {
+			
+				temperature->data[i][j] = 95;
+			} 
+		}
+	}
 }
 
 /* Set dimensions of the field. Note that the nx is the size of the first
