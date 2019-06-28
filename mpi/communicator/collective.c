@@ -10,10 +10,11 @@ void init_buffers(int *sendbuffer, int *recvbuffer, int buffersize);
 
 int main(int argc, char *argv[])
 {
-    int ntasks, rank;
+    int ntasks, rank, color;
     int sendbuf[2 * NTASKS], recvbuf[2 * NTASKS];
     int printbuf[2 * NTASKS * NTASKS];
     int displs[4], rcvcounts[4];
+    MPI_Comm comm;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
@@ -34,15 +35,15 @@ int main(int argc, char *argv[])
 
     /* TODO: use a single collective communication call (and maybe prepare
      *       some parameters for the call) */
-//    MPI_Bcast(sendbuf, 8, MPI_INT, 0, MPI_COMM_WORLD);
-//    MPI_Scatter(sendbuf, 2, MPI_INT, 
-//	recvbuf, 2, MPI_INT, 0, MPI_COMM_WORLD);
+    if ((rank == 0) || (rank == 1)) {
+	color = 0;
+    } else {
+	color = 1;
+    }
 
-//    rcvcounts[0] = 1; rcvcounts[1] = 1; rcvcounts[2] = 2; rcvcounts[3] = 4;
-//    displs[0] = 0; displs[1] = 1; displs[2] = 2; displs[3] = 4;
-//    MPI_Gatherv(sendbuf, rcvcounts[rank], MPI_INT, recvbuf, rcvcounts, displs, MPI_INT, 1, MPI_COMM_WORLD);
+    MPI_Comm_split(MPI_COMM_WORLD, color, rank, &comm);
 
-    MPI_Alltoall(sendbuf, 2, MPI_INT, recvbuf, 2, MPI_INT, MPI_COMM_WORLD);
+    MPI_Reduce(sendbuf, recvbuf, 8, MPI_INT, MPI_SUM, 0, comm);
     /* Print data that was received */
     /* TODO: add correct buffer */
 //    print_buffers(printbuf, sendbuf, 2 * NTASKS);
