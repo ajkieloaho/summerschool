@@ -6,7 +6,7 @@ int main(int argc, char **argv)
     int rank;
     int array[8][8];
     //TODO: Declare a variable storing the MPI datatype
-
+    MPI_Datatype coltype;
     int i, j;
 
     MPI_Init(&argc, &argv);
@@ -38,11 +38,14 @@ int main(int argc, char **argv)
     }
 
     //TODO: Create datatype that describes one column. Use MPI_Type_vector.
-
+    MPI_Type_vector(8, 1, 8, MPI_INT , &coltype);
+    MPI_Type_commit(&coltype);
     //TODO: Send first column of matrix form rank 0 to rank 1
-
+    MPI_Sendrecv(&(coltype[0][1]), 1, MPI_Datatype, 1, 11, 
+	&(coltype[0][1]), 1, MPI_Datatype, 0, 11,
+	MPI_COMM_WORLD, MPI_IGNORE_STATUS);
     //TODO: free datatype
-
+    MPI_Free(&row);
     // Print out the result on rank 1
     // The application is correct if the first column has the values of rank 0
     if (rank == 1) {
