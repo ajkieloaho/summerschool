@@ -7,4 +7,4 @@
 #SBATCH -t 2
 #SBATCH --reservation=Summerschool
 
-aprun -n 4 ./exchange
+aprun -n 4 ./nblock
