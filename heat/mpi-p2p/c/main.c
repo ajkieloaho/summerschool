@@ -28,6 +28,8 @@ int main(int argc, char **argv)
     double start_clock;        //!< Time stamps
 
     /* TODO start: initialize MPI */
+    
+    MPI_Init(&argc, &argv);
 
     /* TODO end */
 
@@ -45,7 +47,7 @@ int main(int argc, char **argv)
     start_clock = MPI_Wtime();
 
     /* Time evolve */
-    for (iter = 1; iter < nsteps; iter++) {
+    for (iter = 1; iter < nsteps + 1; iter++) {
         exchange(&previous, &parallelization);
         evolve(&current, &previous, a, dt);
         if (iter % image_interval == 0) {
@@ -65,7 +67,7 @@ int main(int argc, char **argv)
     finalize(&current, &previous);
 
     /* TODO start: finalize MPI */
-
+    MPI_Finalize();
     /* TODO end */
 
     return 0;

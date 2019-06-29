@@ -10,9 +10,11 @@ void init_buffers(int *sendbuffer, int *recvbuffer, int buffersize);
 
 int main(int argc, char *argv[])
 {
-    int ntasks, rank;
+    int ntasks, rank, color;
     int sendbuf[2 * NTASKS], recvbuf[2 * NTASKS];
     int printbuf[2 * NTASKS * NTASKS];
+    int displs[4], rcvcounts[4];
+    MPI_Comm comm;
 
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &ntasks);
@@ -33,10 +35,19 @@ int main(int argc, char *argv[])
 
     /* TODO: use a single collective communication call (and maybe prepare
      *       some parameters for the call) */
+    if ((rank == 0) || (rank == 1)) {
+	color = 0;
+    } else {
+	color = 1;
+    }
 
+    MPI_Comm_split(MPI_COMM_WORLD, color, rank, &comm);
+
+    MPI_Reduce(sendbuf, recvbuf, 8, MPI_INT, MPI_SUM, 0, comm);
     /* Print data that was received */
     /* TODO: add correct buffer */
-    print_buffers(printbuf, ..., 2 * NTASKS);
+//    print_buffers(printbuf, sendbuf, 2 * NTASKS);
+    print_buffers(printbuf, recvbuf, 2 * NTASKS);
 
     MPI_Finalize();
     return 0;

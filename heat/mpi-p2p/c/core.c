@@ -14,10 +14,23 @@ void exchange(field *temperature, parallel_data *parallel)
 
     /* TODO start: implement halo exchange */
     // Send to the up, receive from down
-
+    MPI_Sendrecv(
+	temperature->data[1],
+	temperature->ny + 2, MPI_DOUBLE,
+	parallel->nup, 1,
+	temperature->data[temperature->nx + 1],
+	temperature->ny + 2, MPI_DOUBLE, 
+	parallel->ndown, 1,
+	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     // Send to the down, receive from up
-
-    /* TODO end */
+    MPI_Sendrecv(
+	temperature->data[temperature->nx],
+	temperature->ny + 2, MPI_DOUBLE,
+	parallel->ndown, 2,
+	temperature->data[0],
+	temperature->ny + 2, MPI_DOUBLE, 
+	parallel->nup, 2,
+	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
 
