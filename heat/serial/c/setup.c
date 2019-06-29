@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <math.h>
 
 #include "heat.h"
 #include "pngwriter.h"
@@ -88,22 +87,33 @@ void generate_field(field *temperature)
         malloc_2d(temperature->nx + 2, temperature->ny + 2);
 
     /* TODO: Initialize the values of temperature */
-#error Add field initialization
+// Add field initialization
 	
-	radius = temperature->nx / 6;
+	radius = temperature->nx / 6.0;
 	
-	for (i = 0; i < temperature->nx; i++) {
-		for (j = 0; j < temperature->ny; j++) {
-			distance = (i - nx / 2) * (i - nx / 2) + (j - ny / 2) * (j - ny / 2)
+	for (i = 0; i < temperature->nx + 2; i++) {
+		for (j = 0; j < temperature->ny + 2; j++) {
+			distance = (i - temperature->nx / 2 + 1) * (i - temperature->nx / 2 + 1) 
+					+ (j - temperature->ny / 2 + 1) * (j - temperature->ny / 2 + 1);
 			if (distance < radius * radius) {
 			
-				temperature->data[i][j] = 0;
+				temperature->data[i][j] = 5.0;
 
 			} else {
 			
-				temperature->data[i][j] = 95;
+				temperature->data[i][j] = 65.0;
 			} 
 		}
+	}
+
+	for (i = 0; i < temperature->nx + 2; i++) {
+		temperature->data[i][0] = 20.0;
+		temperature->data[i][temperature->ny + 1] = 70.0;
+	}
+
+	for (j = 0; j < temperature->ny + 2; j++) {
+		temperature->data[0][j] = 85.0;
+		temperature->data[temperature->nx + 1][j] = 5.0;
 	}
 }
 
