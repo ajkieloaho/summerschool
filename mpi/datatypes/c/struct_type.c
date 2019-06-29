@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
     int n = 1000, cnt = 3, reps = 10000;
-    int i, j, myid, ntasks, blocklen[cnt];
+    int i, j, myid, ntasks; //, blocklen[cnt];
     MPI_Datatype particletype, temptype;
     MPI_Aint disp[cnt], dist[2], lb, extent;
     double t1, t2;
@@ -35,6 +35,18 @@ int main(int argc, char *argv[])
     /* TODO (c): define the datatype for the struct particle  using MPI_Type_create_struct
        You can use MPI_Get_address to compute offsets.
     */
+    MPI_Datatype types[3] = {MPI_FLOAT, MPI_INT, MPI_CHAR};
+    int blocklen[3] = {3, 1, 2};
+    MPI_Get_address(&particles[0].coords, &disp[0]);
+    MPI_Get_address(&particles[0].charge, &disp[1]);
+    MPI_Get_address(&particles[0].label, &disp[2]);
+
+    disp[2] -= disp[0];
+    disp[1] -= disp[0];
+    disp[0] = 0;
+
+    MPI_Type_create_struct(cnt, blocklen, disp, types, &particletype);
+    MPI_Type_commit(&particletype);
 
     /* TODO (c): check extent (not really necessary on most platforms) That is,
      * check that extent is identical to the distance between two consequtive
@@ -42,8 +54,18 @@ int main(int argc, char *argv[])
      * Tip, use MPI_Type_get_extent and  MPI_Get_address
      */
 
+    MPI_Type_get_extent(particletype, &lb, &extent);
+    MPI_Get_address(&particles[0], &dist[0]);
+    MPI_Get_address(&particles[1], &dist[1]);
+
     if (extent != (dist[1] - dist[0])) {
         /*TODO (c), resize particle type to correct extent */
+	temptype = particletype;
+	lb = 0;
+	extent = disp[1] - disp[0];
+	MPI_Type_create_resized(temptype, lb, extent, &particletype);
+	MPI_Type_commit(&particletype);
+	MPI_Type_free(&temptype);
     }
 
     /* communicate using the created particletype */
@@ -66,7 +88,7 @@ int main(int argc, char *argv[])
            particles[n - 1].coords[2]);
 
     //TODO: Free datatype
-
+    MPI_Type_free(&particletype);
     MPI_Finalize();
     return 0;
 }
