@@ -8,6 +8,8 @@ int main(int argc, char **argv)
     //TODO: Declare a variable storing the MPI datatype
     MPI_Datatype coltype;
     int i, j;
+    int displs[4];
+    int counts[4];
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -37,16 +39,23 @@ int main(int argc, char **argv)
         }
     }
 
+    for (i = 0; i < 4; i++) {
+	counts[i] = i + 1;
+	displs[i] = i + 2 * i * 8;
+    }
+
     //TODO: Create datatype that describes one column. Use MPI_Type_vector.
-    MPI_Type_vector(8, 1, 8, MPI_INT, &coltype);
+    //MPI_Type_vector(8, 1, 8, MPI_INT, &coltype);
+    MPI_Type_indexed(4, counts, displs, MPI_INT, &coltype);
     MPI_Type_commit(&coltype);
     //TODO: Send first column of matrix form rank 0 to rank 1
     if (rank == 0) {
-	MPI_Send(&array[0][1], 1, coltype, 1, 11, MPI_COMM_WORLD);
+	//MPI_Send(&array[0][1], 1, coltype, 1, 11, MPI_COMM_WORLD);
+	MPI_Send(array, 1, coltype, 1, 1, MPI_COMM_WORLD);
     } else if (rank == 1) {
-	MPI_Recv(&array[0][1], 1, coltype, 0, 11, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	//MPI_Recv(&array[0][1], 1, coltype, 0, 11, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	MPI_Recv(array, 1, coltype, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     }
-    MPI_Type_free(&coltype);
     // Print out the result on rank 1
     // The application is correct if the first column has the values of rank 0
     if (rank == 1) {
@@ -59,6 +68,7 @@ int main(int argc, char **argv)
         }
     }
 
+    MPI_Type_free(&coltype);
     MPI_Finalize();
 
     return 0;
