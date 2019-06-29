@@ -13,15 +13,22 @@ void exchange(field *temperature, parallel_data *parallel)
 {
 
     // Send to the up, receive from down
-    MPI_Sendrecv(temperature->data[1], temperature->ny + 2, MPI_DOUBLE,
-                 parallel->nup, 11,
+    MPI_Sendrecv(
+		temperature->data[1], 
+		temperature->ny + 2, MPI_DOUBLE,
+                 parallel->nup, 
+		11,
                  temperature->data[temperature->nx + 1],
-                 temperature->ny + 2, MPI_DOUBLE, parallel->ndown, 11,
+                 temperature->ny + 2, MPI_DOUBLE, 
+		parallel->ndown, 11,
                  MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     // Send to the down, receive from up
-    MPI_Sendrecv(temperature->data[temperature->nx], temperature->ny + 2,
-                 MPI_DOUBLE, parallel->ndown, 12,
-                 temperature->data[0], temperature->ny + 2, MPI_DOUBLE,
+    MPI_Sendrecv(
+		temperature->data[temperature->nx], 
+		temperature->ny + 2, MPI_DOUBLE, 
+		parallel->ndown, 12,
+                 temperature->data[0], 
+		temperature->ny + 2, MPI_DOUBLE,
                  parallel->nup, 12, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
