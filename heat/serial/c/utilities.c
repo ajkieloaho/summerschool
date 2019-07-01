@@ -16,10 +16,10 @@ double **malloc_2d(int nx, int ny)
 
     /* TODO: Add here the 2D array allocation */
 // Add allocation of 2D array
-	array = malloc(nx * sizeof(float *));
-	array[0] = malloc(nx * ny * sizeof(float));
+	array = (double **) malloc(nx * sizeof(double *));
+	array[0] = (double *) malloc(nx * ny * sizeof(double));
 
-	for (i = 0; i < nx; i++) {
+	for (i = 1; i < nx; i++) {
 		array[i] = array[0] + i * ny;
 	}
 

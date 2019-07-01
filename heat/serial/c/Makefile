@@ -1,5 +1,5 @@
 ifeq ($(COMP),)
-COMP=cray
+COMP=gnu
 endif
 
 COMMONDIR=$(shell \
@@ -18,10 +18,11 @@ LIBS=-lpng -lz
 endif
 
 ifeq ($(COMP),gnu)
-CC=gcc
-CCFLAGS=-O3 -Wall -I$(COMMONDIR)
+CC=clang
+CCFLAGS= -g -I$(COMMONDIR) -I/opt/local/include/libpng16
+#CCFLAGS= -g -fsanitize=address -Wall -I$(COMMONDIR) -I/opt/local/include/libpng16
 LDFLAGS=
-LIBS=-lpng
+LIBS=-lpng -L/opt/local/lib
 endif
 
 EXE=heat_serial

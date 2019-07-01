@@ -93,16 +93,15 @@ void generate_field(field *temperature)
 	
 	for (i = 0; i < temperature->nx + 2; i++) {
 		for (j = 0; j < temperature->ny + 2; j++) {
-			distance = (i - temperature->nx / 2 + 1) * (i - temperature->nx / 2 + 1) 
-					+ (j - temperature->ny / 2 + 1) * (j - temperature->ny / 2 + 1);
-			if (distance < radius * radius) {
 			
-				temperature->data[i][j] = 5.0;
+			dx = i - temperature->nx / 2 + 1;
+			dy = j - temperature->ny / 2 + 1;
 
+			if (dx * dx + dy * dy < radius * radius) {
+				temperature->data[i][j] = 5.0;
 			} else {
-			
 				temperature->data[i][j] = 65.0;
-			} 
+			}
 		}
 	}
 
