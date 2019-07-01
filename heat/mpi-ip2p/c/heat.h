@@ -45,13 +45,17 @@ void initialize(int argc, char *argv[], field *temperature1,
 
 void generate_field(field *temperature, parallel_data *parallel);
 
-void exchange_init(field *temperature, parallel_data *parallel);
+//void exchange_init(field *temperature, parallel_data *parallel);
 
-void evolve_interior(field *curr, field *prev, double a, double dt);
+//void evolve_interior(field *curr, field *prev, double a, double dt);
 
-void exchange_finalize(parallel_data *parallel);
+//void exchange_finalize(parallel_data *parallel);
 
-void evolve_edges(field *curr, field *prev, double a, double dt);
+//void evolve_edges(field *curr, field *prev, double a, double dt);
+
+void exchange(field *temperature, parallel_data *parallel);
+
+void evolve(field *curr, field *prev, double a, double dt);
 
 void write_field(field *temperature, int iter, parallel_data *parallel);
 

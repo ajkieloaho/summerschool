@@ -43,11 +43,13 @@ int main(int argc, char **argv)
     start_clock = MPI_Wtime();
 
     /* Time evolve */
-    for (iter = 1; iter < nsteps; iter++) {
-        exchange_init(&previous, &parallelization);
-        evolve_interior(&current, &previous, a, dt);
-        exchange_finalize(&parallelization);
-        evolve_edges(&current, &previous, a, dt);
+    for (iter = 1; iter < nsteps + 1; iter++) {
+//        exchange_init(&previous, &parallelization);
+//        evolve_interior(&current, &previous, a, dt);
+//        exchange_finalize(&parallelization);
+//        evolve_edges(&current, &previous, a, dt);
+	exchange(&previous, &parallelization);
+	evolve(&current, &previous, a, dt);
         if (iter % image_interval == 0) {
             write_field(&current, iter, &parallelization);
         }
