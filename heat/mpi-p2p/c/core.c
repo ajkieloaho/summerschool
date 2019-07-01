@@ -12,6 +12,9 @@
 void exchange(field *temperature, parallel_data *parallel)
 {
 
+    MPI_Request requests[4];
+    MPI_Statuses statuses[4];
+
     /* TODO start: implement halo exchange */
     // Send to the up, receive from down
     MPI_Sendrecv(
@@ -22,6 +25,25 @@ void exchange(field *temperature, parallel_data *parallel)
 	temperature->ny + 2, MPI_DOUBLE, 
 	parallel->ndown, 1,
 	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    MPI_Isend(
+	temperature->data[1],
+	temperature->ny + 2, MPI_DOUBLE,
+	parallel->nup, 1,
+	temperature->data[temperature->nx + 1],
+	temperature->ny + 2, MPI_DOUBLE, 
+	parallel->ndown, 1,
+	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+    MPI_Irecv(
+	temperature->data[1],
+	temperature->ny + 2, MPI_DOUBLE,
+	parallel->nup, 1,
+	temperature->data[temperature->nx + 1],
+	temperature->ny + 2, MPI_DOUBLE, 
+	parallel->ndown, 1,
+	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
     // Send to the down, receive from up
     MPI_Sendrecv(
 	temperature->data[temperature->nx],
