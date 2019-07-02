@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include <mpi.h>
-
+#include <omp.h>
 #include "heat.h"
 
 /* Exchange the boundary values */
@@ -13,29 +13,10 @@ void exchange(field *temperature, parallel_data *parallel)
 {
 
     MPI_Request requests[4];
-    MPI_Statuses statuses[4];
 
     /* TODO start: implement halo exchange */
     // Send to the up, receive from down
     MPI_Sendrecv(
-	temperature->data[1],
-	temperature->ny + 2, MPI_DOUBLE,
-	parallel->nup, 1,
-	temperature->data[temperature->nx + 1],
-	temperature->ny + 2, MPI_DOUBLE, 
-	parallel->ndown, 1,
-	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-    MPI_Isend(
-	temperature->data[1],
-	temperature->ny + 2, MPI_DOUBLE,
-	parallel->nup, 1,
-	temperature->data[temperature->nx + 1],
-	temperature->ny + 2, MPI_DOUBLE, 
-	parallel->ndown, 1,
-	MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-    MPI_Irecv(
 	temperature->data[1],
 	temperature->ny + 2, MPI_DOUBLE,
 	parallel->nup, 1,
@@ -67,6 +48,9 @@ void evolve(field *curr, field *prev, double a, double dt)
      * are not updated. */
     dx2 = prev->dx * prev->dx;
     dy2 = prev->dy * prev->dy;
+#pragma omp parallel shared(curr, prev), private(i, j)
+{
+    #pragma omp for schedule(guided)  
     for (i = 1; i < curr->nx + 1; i++) {
         for (j = 1; j < curr->ny + 1; j++) {
             curr->data[i][j] = prev->data[i][j] + a * dt *
@@ -78,6 +62,7 @@ void evolve(field *curr, field *prev, double a, double dt)
                                  prev->data[i][j - 1]) / dy2);
         }
     }
+}
 }
 
 

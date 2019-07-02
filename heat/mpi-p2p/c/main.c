@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <mpi.h>
-
+#include <omp.h>
 #include "heat.h"
 
 
@@ -27,9 +27,11 @@ int main(int argc, char **argv)
 
     double start_clock;        //!< Time stamps
 
+    int provided, required=MPI_THREAD_FUNNELED;
+
     /* TODO start: initialize MPI */
     
-    MPI_Init(&argc, &argv);
+    MPI_Init_thread(&argc, &argv, required, &provided);
 
     /* TODO end */
 
