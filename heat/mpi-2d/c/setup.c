@@ -202,6 +202,10 @@ void parallel_setup(parallel_data *parallel, int nx, int ny)
         * Datatype for communication of columns (parallel->columntype)
         * Datatype for communication of rows (parallel->rowtype) */
 
+    int count, block, stride;
+    MPI_Type_vector(count, block, stride, MPI_DOUBLE, &parallel->columntype);
+    MPI_Type_vector(count, block, stride, MPI_DOUBLE, &parallel->rowtype);
+
     MPI_Type_commit(&parallel->columntype);
     MPI_Type_commit(&parallel->rowtype);
 
