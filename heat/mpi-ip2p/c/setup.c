@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include <mpi.h>
-
+#include <omp.h>
 #include "heat.h"
 #include "pngwriter.h"
 
@@ -140,6 +140,8 @@ void set_field_dimensions(field *temperature, int nx, int ny,
 
 void parallel_setup(parallel_data *parallel, int nx, int ny)
 {
+    int i;
+
     MPI_Comm_size(MPI_COMM_WORLD, &parallel->size);
     MPI_Comm_rank(MPI_COMM_WORLD, &parallel->rank);
 
@@ -154,6 +156,19 @@ void parallel_setup(parallel_data *parallel, int nx, int ny)
     if (parallel->ndown > parallel->size - 1) {
         parallel->ndown = MPI_PROC_NULL;
     }
+
+    int nthreads;
+    nthreads = omp_get_max_threads();
+
+    parallel->communicators = (MPI_Comm *) malloc(nthreads * sizeof(MPI_Comm));
+    parallel->displacements = (int *) malloc((nthreads + 1) * sizeof(int));
+
+    for (i = 0; i < nthreads; i++) {
+	MPI_Comm_split(MPI_COMM_WORLD, i, parallel->rank, &parallel->communicators[i]);
+	parallel->displacements[i] = 1 + i * (ny) / nthreads;
+    }
+    parallel->displacements[nthreads] = ny + 1;
+
 }
 
 void parallel_set_dimensions(parallel_data *parallel, int nx, int ny)
@@ -174,4 +189,3 @@ void finalize(field *temperature1, field *temperature2)
     free_2d(temperature1->data);
     free_2d(temperature2->data);
 }
-

@@ -27,9 +27,16 @@ int main(int argc, char **argv)
 
     double start_clock;        //!< Time stamps
 
-    int provided, required = MPI_THREAD_FUNNELED;
+    int provided, required = MPI_THREAD_MULTIPLE;
+    
+    int thread_id;
 
     MPI_Init_thread(&argc, &argv, required, &provided);
+    if (provided < MPI_THREAD_MULTIPLE) {
+	printf("MPI_THREAD_MULTIPLE thread support level required.\n");
+	MPI_Abort(MPI_COMM_WORLD, 5);
+    }
+
 
     initialize(argc, argv, &current, &previous, &nsteps, &parallelization);
 
@@ -40,7 +47,7 @@ int main(int argc, char **argv)
     dx2 = current.dx * current.dx;
     dy2 = current.dy * current.dy;
     dt = dx2 * dy2 / (2.0 * a * (dx2 + dy2));
-
+    
     /* Get the start time stamp */
     start_clock = MPI_Wtime();
 
@@ -57,8 +64,10 @@ int main(int argc, char **argv)
         }
         /* Swap current field so that it will be used
         as previous for next iteration step */
-        swap_fields(&current, &previous);
+        
+	swap_fields(&current, &previous);
     }
+
 
     /* Determine the CPU time used for the iteration */
     if (parallelization.rank == 0) {

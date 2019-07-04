@@ -12,37 +12,51 @@
 void exchange(field *temperature, parallel_data *parallel)
 {
 
+    int tid, length;
+#pragma omp parallel private(tid)
+{ // start of parallel region
+
+    tid = omp_get_thread_num();
+
+    length = parallel->displacements[tid + 1] 
+	- parallel->displacements[tid];
+
+
     /* TODO start: implement halo exchange */
     // Send to the up, receive from down
     MPI_Isend(
-	temperature->data[1],
-	temperature->ny + 2, MPI_DOUBLE,
+	&temperature->data[1][parallel->displacements[tid]],
+	//temperature->ny + 2, MPI_DOUBLE,
+	length, MPI_DOUBLE,
 	parallel->nup, 1,
-	MPI_COMM_WORLD, &parallel->requests[0]
+	parallel->communicators[tid], &parallel->requests[0]
     );
 
     MPI_Irecv(
-	temperature->data[temperature->nx + 1],
-	temperature->ny + 2, MPI_DOUBLE, 
+	&temperature->data[temperature->nx + 1][parallel->displacements[tid]],
+	//temperature->ny + 2, MPI_DOUBLE, 
+	length, MPI_DOUBLE,
 	parallel->ndown, 1,
-	MPI_COMM_WORLD, &parallel->requests[1] 
+	parallel->communicators[tid], &parallel->requests[1] 
     );
 
     // Send to the down, receive from up
     MPI_Isend(
-	temperature->data[temperature->nx],
-	temperature->ny + 2, MPI_DOUBLE,
+	&temperature->data[temperature->nx][parallel->displacements[tid]],
+	//temperature->ny + 2, MPI_DOUBLE,
+	length, MPI_DOUBLE,
 	parallel->ndown, 2,
-	MPI_COMM_WORLD, &parallel->requests[2]
+	parallel->communicators[tid], &parallel->requests[2]
     );
     
     MPI_Irecv(
-	temperature->data[0],
-	temperature->ny + 2, MPI_DOUBLE, 
+	&temperature->data[0][parallel->displacements[tid]],
+	//temperature->ny + 2, MPI_DOUBLE, 
+	length, MPI_DOUBLE,
 	parallel->nup, 2,
-	MPI_COMM_WORLD, &parallel->requests[3]
+	parallel->communicators[tid], &parallel->requests[3]
     );
-    
+ } // End of parallel region   
 
    MPI_Waitall(4, parallel->requests, MPI_STATUS_IGNORE);
 }

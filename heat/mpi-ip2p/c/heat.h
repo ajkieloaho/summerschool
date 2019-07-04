@@ -20,6 +20,8 @@ typedef struct {
     int rank;
     int nup, ndown;      /* Ranks of neighbouring MPI tasks */
     MPI_Request requests[4];    /* Requests for non-blocking communication */
+    MPI_Comm *communicators;	/* thread communicators */
+    int *displacements;	/* displacements for thread boundaries */
 } parallel_data;
 
 

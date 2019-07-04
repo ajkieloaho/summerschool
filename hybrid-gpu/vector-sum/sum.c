@@ -22,12 +22,34 @@ int main(void)
      * vecC = vecA + vecB
      */
 
-    /* Compute the check value */
     sum = 0.0;
+{
+    #pragma acc kernels
+    /* Compute the check value */
+    for (i = 0; i < NX; i++) {
+        vecC[i] = vecA[i] + vecB[i] ;
+    }
+}
+
+    /* Compute the check value */
     for (i = 0; i < NX; i++) {
         sum += vecC[i];
     }
-    printf("Reduction sum: %18.16f\n", sum);
+    printf("Reduction sum with kernels: %18.16f\n", sum);
 
+    sum = 0.0;
+{
+    #pragma acc parallel loop
+    /* Compute the check value */
+    for (i = 0; i < NX; i++) {
+        vecC[i] = vecA[i] + vecB[i] ;
+    }
+}
+
+    /* Compute the check value */
+    for (i = 0; i < NX; i++) {
+        sum += vecC[i];
+    }
+    printf("Reduction sum with parallel: %18.16f\n", sum);
     return 0;
 }

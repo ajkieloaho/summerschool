@@ -7,4 +7,4 @@
 #SBATCH -t 5
 #SBATCH --reservation=Summerschool
 
-aprun -e OMP_NUM_THREADS=8 -n 2 -d 8 ./heat_mpi
+aprun -e OMP_NUM_THREADS=8 -e MPICH_MAX_THREAD_SAFETY=multiple -n 2 -d 8 ./heat_mpi
